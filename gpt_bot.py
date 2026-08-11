@@ -39,7 +39,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "ជម្រាបសួរ! ខ្ញុំគឺជា Telegram Bot ដែលប្រើប្រាស់ Google Gemini (Free API)។ តើខ្ញុំអាចជួយអ្វីអ្នកបានខ្លះនៅថ្ងៃនេះ?"
     )
 
-sync def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
         return
 
