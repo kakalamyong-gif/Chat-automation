@@ -38,6 +38,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Ignore updates that aren't standard text messages (e.g., photos, stickers, edited messages)
+    if not update.message or not update.message.text:
+        return
+
     user_text = update.message.text
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
