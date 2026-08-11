@@ -38,7 +38,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Ignore updates that aren't standard text messages (e.g., photos, stickers, edited messages)
     if not update.message or not update.message.text:
         return
 
@@ -46,9 +45,9 @@ async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
     try:
-        # Asynchronous query to Gemini 2.5 Flash
+        # Change model from "gemini-2.5-flash" to "gemini-3.5-flash"
         response = await gemini_client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.5-flash",
             contents=user_text,
             config=types.GenerateContentConfig(
                 system_instruction=(
@@ -65,9 +64,8 @@ async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     except Exception as e:
         logging.error(f"Gemini API Error: {e}")
         await update.message.reply_text(
-            "សូមអភ័យទោស មានបញ្ហាក្នុងការដំណើរការសំណើរបស់អ្នក។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។"
+            "សូមអភ័យទោស មានបញ្ហាក្នុងការដំណើរការសំណើរបស់អ្នក។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ。"
         )
-
 def main():
     Thread(target=run_web_server, daemon=True).start()
 
