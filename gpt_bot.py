@@ -45,17 +45,16 @@ async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
     try:
-        # Change model from "gemini-2.5-flash" to "gemini-3.5-flash"
         response = await gemini_client.aio.models.generate_content(
             model="gemini-3.5-flash",
             contents=user_text,
             config=types.GenerateContentConfig(
                 system_instruction=(
-                    "You are a helpful, polite, and clear AI assistant in a Telegram chat. "
-                    "Always respond in natural, grammatically correct Khmer language (ភាសាខ្មែរ). "
-                    "If the user asks in English or another language, still answer them in Khmer unless explicitly asked otherwise."
+                    "You are a helpful, polite AI assistant in a Telegram chat. "
+                    "Always respond in clear, natural, and grammatically complete Khmer (ភាសាខ្មែរ) sentences. "
+                    "Keep answers concise, but NEVER leave a sentence unfinished or cut off mid-word."
                 ),
-                max_output_tokens=600,
+                max_output_tokens=2048,  # Increased token limit so Khmer text completes fully
             ),
         )
 
@@ -64,7 +63,7 @@ async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE
     except Exception as e:
         logging.error(f"Gemini API Error: {e}")
         await update.message.reply_text(
-            "សូមអភ័យទោស មានបញ្ហាក្នុងការដំណើរការសំណើរបស់អ្នក។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ。"
+            "សូមអភ័យទោស មានបញ្ហាក្នុងការដំណើរការសំណើរបស់អ្នក។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។"
         )
 def main():
     Thread(target=run_web_server, daemon=True).start()
