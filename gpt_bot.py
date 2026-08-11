@@ -1,6 +1,8 @@
+from datetime import datetime
 import os
 import logging
 from threading import Thread
+import zoneinfo  # Built-in in Python 3.9+
 from flask import Flask
 from google import genai
 from google.genai import types
@@ -37,24 +39,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "ជម្រាបសួរ! ខ្ញុំគឺជា Telegram Bot ដែលប្រើប្រាស់ Google Gemini (Free API)។ តើខ្ញុំអាចជួយអ្វីអ្នកបានខ្លះនៅថ្ងៃនេះ?"
     )
 
-async def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+sync def handle_gemini_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
         return
 
     user_text = update.message.text
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
+    # 1. Get current date and time in Cambodia (ICT / UTC+7)
     try:
+        current_time = datetime.now(zoneinfo.ZoneInfo("Asia/Phnom_Penh")).strftime(
+            "%A, %d %B %Y"
+        )
+    except Exception:
+        current_time = datetime.now().strftime("%A, %d %B %Y")
+
+    try:
+        # 2. Inject current_time into the system instruction
         response = await gemini_client.aio.models.generate_content(
             model="gemini-3.5-flash",
             contents=user_text,
             config=types.GenerateContentConfig(
                 system_instruction=(
+                    f"Today's date is {current_time}. "
                     "You are a helpful, polite AI assistant in a Telegram chat. "
-                    "Always respond in clear, natural, and grammatically complete Khmer (ភាសាខ្មែរ) sentences. "
-                    "Keep answers concise, but NEVER leave a sentence unfinished or cut off mid-word."
+                    "Always respond in clear, natural, and grammatically complete Khmer (ភាសាខ្មែរ) sentences."
                 ),
-                max_output_tokens=2048,  # Increased token limit so Khmer text completes fully
+                max_output_tokens=2048,
             ),
         )
 
